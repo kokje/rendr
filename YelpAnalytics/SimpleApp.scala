@@ -20,8 +20,8 @@ object SimpleApp {
         }
 
         def main(args: Array[String]) {
-                val reviewFile = "../reviews.json" // Dump of yelp reviews
-                val businessFile = "../businesses.json" // Dump of yelp business metadata
+                val reviewFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/reviews.json" // Dump of yelp reviews
+                val businessFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/businesses.json" // Dump of yelp business metadata
 
                 val conf = new SparkConf().setAppName("Simple App").setMaster("local").setJars(List("target/scala-2.10/simple-project_2.10-1.0.jar")).set("spark.cassandra.connection.host", "172.31.19.62")
                 val sc = new SparkContext(conf)
