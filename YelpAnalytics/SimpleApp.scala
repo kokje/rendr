@@ -2,10 +2,17 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
+import org.apache.spark.SparkConf
+import com.datastax.spark.connector._
+
+//import org.apache.log4j.Logger
+//import org.apache.log4j.Level
+
 case class Restaurant (business_id: String, name: String, city: String, state: String )
 case class UserGraph (business_id : String, user_id : String, name : String, city : String, state : String)
 
 object SimpleApp {
+
         def getRestaurantsFromBusinesses(business_id : String, name: String, city: String, state: String, categories: Seq[String]) : Restaurant = {
                 if (categories.contains("Restaurants")) {
                         Restaurant(business_id, name, city, state)
@@ -20,10 +27,15 @@ object SimpleApp {
         }
 
         def main(args: Array[String]) {
+
+                //Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
+                //Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.OFF)
+
                 val reviewFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/reviews.json" // Dump of yelp reviews
                 val businessFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/businesses.json" // Dump of yelp business metadata
 
-                val conf = new SparkConf().setAppName("Simple App").setMaster("local").setJars(List("target/scala-2.10/simple-project_2.10-1.0.jar")).set("spark.cassandra.connection.host", "172.31.19.62")
+                val conf = new SparkConf().setAppName("Simple App").set("spark.cassandra.connection.host", "172.31.19.62")
+
                 val sc = new SparkContext(conf)
 
                 val sqlContext = new org.apache.spark.sql.SQLContext(sc)
@@ -46,4 +58,3 @@ object SimpleApp {
                 collection.saveToCassandra("test", "cities", SomeColumns("business_id", "user_id", "name","city", "state"))
         }
 }
-     
