@@ -1,15 +1,14 @@
 /***SimpleApp.scala ***/
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
-
 import org.apache.spark.SparkConf
-import com.datastax.spark.connector._
-
-//import org.apache.log4j.Logger
-//import org.apache.log4j.Level
+import org.apache.spark.graphx._
+import org.apache.spark.rdd.RDD
 
 case class Restaurant (business_id: String, name: String, city: String, state: String )
 case class UserGraph (business_id : String, user_id : String, name : String, city : String, state : String)
+
+case class VertexProperty(val vertex_id: Long, val name: String)
 
 object SimpleApp {
 
@@ -26,16 +25,15 @@ object SimpleApp {
                 restaurant.business_id != "-1"
         }
 
+	def computeAndSend(rankedGraph : Graph[Double, Double] ) = {
+		val result = rankedGraph.vertices.filter(value => value._2 > 0.15).collect().foreach(println)
+	}
+
         def main(args: Array[String]) {
+                val reviewFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/reviews_small.json" // Dump of yelp reviews
+                val businessFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/businesses_small.json" // Dump of yelp business metadata
 
-                //Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
-                //Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.OFF)
-
-                val reviewFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/reviews.json" // Dump of yelp reviews
-                val businessFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/businesses.json" // Dump of yelp business metadata
-
-                val conf = new SparkConf().setAppName("Simple App").set("spark.cassandra.connection.host", "172.31.19.62")
-
+		val conf = new SparkConf().setAppName("Simple App")
                 val sc = new SparkContext(conf)
 
                 val sqlContext = new org.apache.spark.sql.SQLContext(sc)
@@ -51,10 +49,15 @@ object SimpleApp {
 
                 val restaurantRDD = businessDF.map(p => getRestaurantsFromBusinesses(p.getString(0), p.getString(1), p.getString(2), p.getString(3), p.getSeq(4))).filter(value => filterNulls(value))
                 val joinedResult = reviewsDF.join(restaurantRDD.toDF(), "business_id")
-
-                // Should we group by at this stage or dump everything?
-                val collection = joinedResult.map(line => UserGraph(line.getString(0), line.getString(1), line.getString(2),line.getString(3), line.getString(4)))
-                // Does this override or append?
-                collection.saveToCassandra("test", "cities", SomeColumns("business_id", "user_id", "name","city", "state"))
-        }
+		
+		val restaurantPropertyRDD : RDD[(VertexId, String)] = joinedResult.select("business_id", "name").map(resto => (resto.getString(0).hashCode().asInstanceOf[VertexId], resto.getString(1)))
+		val userPropertyRDD : RDD[(VertexId, String)] = joinedResult.select("user_id").map(user => (user.getString(0).hashCode().asInstanceOf[VertexId], "user"))
+		
+		val vertexRDD : RDD[(VertexId, String)] = userPropertyRDD.union(restaurantPropertyRDD)
+		val edgeRDD : RDD[Edge[Int]] = joinedResult.map(line => Edge(line.getString(1).hashCode(), line.getString(0).hashCode(), 1))	
+		
+		val graph : Graph[String,Int] = Graph(vertexRDD, edgeRDD)
+		val result = graph.personalizedPageRank(restaurantPropertyRDD.first()._1, 0.0001)
+		computeAndSend(result)
+	}
 }
