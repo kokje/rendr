@@ -7,6 +7,7 @@ scalaVersion := "2.10.5"
 libraryDependencies ++= Seq(
 "org.apache.spark" %% "spark-core" % "1.4.1",
 "org.apache.spark" %% "spark-sql" % "1.4.1",
+"org.apache.spark" %% "spark-graphx" % "1.4.1",
 "com.datastax.spark" %% "spark-cassandra-connector" % "1.4.0"
 )
 
