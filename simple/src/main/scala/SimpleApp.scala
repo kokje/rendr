@@ -30,8 +30,8 @@ object SimpleApp {
 	}
 
         def main(args: Array[String]) {
-                val reviewFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/reviews_small.json" // Dump of yelp reviews
-                val businessFile = "hdfs://ec2-54-183-27-164.us-west-1.compute.amazonaws.com:9000/yelp/businesses_small.json" // Dump of yelp business metadata
+                val reviewFile = "hdfs://ec2-54-193-103-208.us-west-1.compute.amazonaws.com:9000/yelp/reviews_small.json" // Dump of yelp reviews
+                val businessFile = "hdfs://ec2-54-193-103-208.us-west-1.compute.amazonaws.com:9000/yelp/businesses_small.json" // Dump of yelp business metadata
 
 		val conf = new SparkConf().setAppName("Simple App")
                 val sc = new SparkContext(conf)
