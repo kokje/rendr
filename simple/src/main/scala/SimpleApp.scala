@@ -1,10 +1,10 @@
 /***SimpleApp.scala ***/
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkContext,SparkConf}
 import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 import com.datastax.spark.connector._
+import org.apache.spark.storage.StorageLevel
 
 case class Restaurant (business_id: String, name: String, city: String, state: String )
 
@@ -48,25 +48,25 @@ object SimpleApp {
                 val reviewsDF = sqlContext.jsonFile(reviewFile).select("business_id", "user_id")
 		
 		// Todo: This is a static list so maybe read cities from a file?
-		val states = List("PA","IL","WI", "NV", "AZ", "NC")
+		val states = List("PA")
 		for (state <- states) {
  
                 	val restaurantRDD = businessDF.map(p => getRestaurantsFromBusinesses(p.getString(0), p.getString(1), p.getString(2), p.getString(3), p.getSeq(4))).filter(value => filterRestaurants(value, state))
 			// Todo: How do I optimize this join? Cache reviews table? 
 			val joinedResult = reviewsDF.join(restaurantRDD.toDF(), "business_id")
 			// Todo: What happens with and without distinct?		
-			val restaurantPropertyRDD : RDD[(VertexId, String)] = joinedResult.select("business_id", "name").map(resto => (resto.getString(0).hashCode().asInstanceOf[VertexId], resto.getString(0))).distinct()
+			val restaurantPropertyRDD : RDD[(VertexId, String)] = joinedResult.select("business_id", "name").map(resto => (resto.getString(0).hashCode().asInstanceOf[VertexId], resto.getString(0))).distinct().persist(StorageLevel.MEMORY_AND_DISK_SER)
 			val userPropertyRDD : RDD[(VertexId, String)] = joinedResult.select("user_id").map(user => (user.getString(0).hashCode().asInstanceOf[VertexId], "user")).distinct()
 			
 			joinedResult.select("user_id", "business_id").map(line => (line.getString(0), line.getString(1), line.getString(1).hashCode())).saveToCassandra("test", "seeds",SomeColumns("user_id","restaurant_id", "restaurant_id_num"))
 			restaurantPropertyRDD.saveToCassandra("test", "idmapper",SomeColumns("restaurant_id_num", "restaurant_id"))
 			
 			val vertexRDD : RDD[(VertexId, String)] = userPropertyRDD.union(restaurantPropertyRDD)
-			val edgeRDD : RDD[Edge[Int]] = joinedResult.map(line => Edge(line.getString(1).hashCode(), line.getString(0).hashCode(), 1))	
+			val edgeRDD : RDD[Edge[Int]] = joinedResult.map(line => Edge(line.getString(1).hashCode(), line.getString(0).hashCode(), 1))
 		
 			// What do edges imply?
 			val graph : Graph[String,Int] = Graph(vertexRDD, edgeRDD)
-                	restaurantRDD.collect().foreach(value => computeAndSend(value.business_id.hashCode(), graph.personalizedPageRank(value.business_id.hashCode(), 0.0001)))
+			restaurantRDD.collect().foreach(value => computeAndSend(value.business_id.hashCode(), graph.personalizedPageRank(value.business_id.hashCode(), 0.0001)))
 		}
 	}
 }
