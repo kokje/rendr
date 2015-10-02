@@ -1,3 +1,4 @@
+package rendr
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
@@ -5,6 +6,8 @@ import org.apache.spark.rdd.RDD
 case class Rating (user_id : Int, venue_id : Int, rating : Int)
 case class Venue  (venue_id : Int, lat : Double, long : Double)
 case class Business  (business_id : String, lat : Double, long : Double)
+case class HashedBusiness(business_id : String, geohash : String)
+case class HashedVenue(venue_id : Int, geohash : String)
 
 object FoursquareDataSet {
 	
@@ -31,6 +34,10 @@ object FoursquareDataSet {
                         val fields = line.split("\\s+")
                         Venue(fields(1).toInt, fields(3).toDouble, fields(5).toDouble)
                 }.cache()
-		venues.collect().foreach(println)
+		//venues.collect().foreach(println)
+		val hashedVenueFoursquare = venues.map(line => HashedVenue(line.venue_id, GeoHash.encode(line.lat,line.long)))
+		val businesses  = sqlContext.jsonFile(businessesFile).select("business_id", "latitude", "longitude").map(line => Business(line.getString(0), line.getDouble(1), line.getDouble(2)))
+		val hashedVenueYelp = businesses.map(line => HashedBusiness(line.business_id, GeoHash.encode(line.lat, line.long)))
+		hashedVenueYelp.collect().foreach(println)		
 	}
 }
