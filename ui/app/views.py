@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, url_for,jsonify
 def home():
 	return render_template("index.html")
 
-@app.route('/user/<user_id>')
-def getResults(user_id):
-	return "Hello"
+@app.route('/login')
+def getResults():
+	user_id = request.args.get("username")
+	return "hello"

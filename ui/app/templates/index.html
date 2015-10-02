@@ -75,23 +75,23 @@
                         <h1>Welcome to Rendr</h1>
                         <h3>Find the best restaurants for you...</h3>
                         <hr class="intro-divider">
-                        <form class="form-inline">
+                        <form class="form-inline" action="login" method="get">
                             <div class="form-group">
-                                <input type="email" class="form-control" id="exampleInputEmail3" placeholder="Email">
+                                <input type="text" name="username" placeholder="Username">
                             </div>
                             <div class="form-group">
-                                <input type="password" class="form-control" id="exampleInputPassword3" placeholder="Password">
+                                <input type="password" id="pwd" placeholder="Password">
                             </div>
                             <h3></h3>
                             <ul class="list-inline intro-social-buttons">
                                 <li>
-                                    <a href="http://localhost:5000/login" class="btn btn-default btn-lg"><i class="fa fa-unlock fa-fw"></i> <span class="network-name">Sign In</span></a>
+                                    <button type="submit" class="btn btn-default btn-lg"><i class="fa fa-unlock fa-fw"></i><span class="network-name">Log In</button>
                                 </li>
                                 <li>
-                                    <a href="http://localhost:5000/login" class="btn btn-default btn-lg"><i class="fa fa-yelp fa-fw"></i> <span class="network-name">Yelp</span></a>
+                                    <a href="http://localhost:5000" class="btn btn-default btn-lg"><i class="fa fa-yelp fa-fw"></i> <span class="network-name">Yelp</span></a>
                                 </li>
                                 <li>
-                                    <a href="http://localhost:5000/login" class="btn btn-default btn-lg"><i class="fa fa-user fa-fw"></i> <span class="network-name">Sign Up</span></a>
+                                    <a href="http://localhost:5000" class="btn btn-default btn-lg"><i class="fa fa-user fa-fw"></i> <span class="network-name">Sign Up</span></a>
                                 </li>
                             </ul>
                         </form>
