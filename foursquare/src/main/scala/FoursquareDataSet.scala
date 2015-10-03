@@ -55,7 +55,7 @@ object FoursquareDataSet {
 		
 		// Join restaurants from foursquare with ratings
 		// RDD[VenueID, (Restaurant,Rating)] -> RestaurantID | UserID | Rating
-		restaurantsYelpFoursquare.join(ratings).map(line => (line._2._1.business_id, line._2._2.user_id, line._2._2.rating)).foreach(println)	
-		// Filter ratings based on  		
+		restaurantsYelpFoursquare.join(ratings).map(line => (line._2._1.business_id, line._2._2.user_id, line._2._2.rating)).saveAsTextFile("foursquare_clean")	
+		 		
 	}
 }
