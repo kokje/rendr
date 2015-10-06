@@ -67,13 +67,14 @@ def login():
 			business_id = name_city[0][0][0]+"-"+name_city[0][0][1]
 			business_id = business_id.replace(' ', '-').lower()
 			recommendations.append(business_id)		
-	return render_template("recommendation.html", counter=1)
+	url = 'http://www.yelp.com/biz/' + recommendations[0]
+	img = get_business(recommendations[0]).get('image_url')
+	return render_template("recommendation.html",restaurant_pic = img, url = url, counter=0)
 
 @app.route('/next')
 def get_next():
 	count = int(request.args.get('counter'))
 	count = count + 1
-	#get_business(recommendations[count])
-	img = '/home/ubuntu/rendr/ui/app/stocimg.jpg'
+	img = get_business(recommendations[count]).get('image_url')
 	url = 'http://www.yelp.com/biz/' + recommendations[count]
 	return render_template("recommendation.html", restaurant_pic = img, url = url, counter = str(count))
