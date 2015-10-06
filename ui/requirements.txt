@@ -1,0 +1,3 @@
+auth2
+httplib2
+cassandra-driver
