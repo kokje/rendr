@@ -7,8 +7,7 @@ Project built during the Insight Data Engineering program
 1. [Introduction] (README.md#1-introduction)
 2. [AWS Clusters] (README.md#2-aws-clusters)
 3. [Data Pipeline] (README.md#3-data-pipeline)
-4. [Front End] (README.md#5-front-end)
-5. [Presentation] (README.md#6-presentation)
+4. [Front End] (README.md#4-front-end)
 
 ## 1. Introduction
 Rendr is an application that builds a bipartite graph of users and restaurants to make recommendations using the structure of this network.
@@ -44,6 +43,6 @@ Rendr is powered by three clusters on AWS-
   * Ranks - key is the restaurant id and values are the ranks and ids of other restaurants in the network
   * IdMapper - key is the restaurant id and value is the metadata of the restaurant such as name, city, state which is needed to construct the query to the yelp API
 
-## 5. Front end
+## 4. Front end
 Used flask for the front end along with javascript, html and css for views
 
