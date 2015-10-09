@@ -1,4 +1,4 @@
-Currentl the program excepts users to have some sort of history with either yelp or foursquare to serve as the seed to the algorithm. Eventually I would like to determine how to overcome the cold start problem and recommend to brand new users
+Currently the program expects users to have some sort of history with either yelp or foursquare to serve as the seed to the algorithm. Eventually I would like to overcome the cold start problem and recommend to brand new users
 
 user_hashid
 ----------------------
