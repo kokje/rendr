@@ -22,11 +22,7 @@ Rendr is powered by three clusters on AWS-
 * 3 t2.mediums for [Kafka] (http://kafka.apache.org/) and [Zookeeper] (https://zookeeper.apache.org/)
 * 3 t2.mediums for [Cassandra](http://cassandra.apache.org/) and [Flask] (http://flask.pocoo.org/)
 
-![Clusters] (/flask/static/img/clusters.png)
-
 ## 3. Data Pipeline
-
-![Pipeline] (/flask/static/img/pipeline.png)
 
  * ### Data Collection and Ingestion 
   * The data collected from the sources is stored on [HDFS](http://hadoop.apache.org/docs/r1.2.1/hdfs_design.html) with 3 data nodes and 1 name node. 
