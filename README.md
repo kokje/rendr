@@ -27,7 +27,7 @@ Rendr is powered by three clusters on AWS-
  * ### Data Collection and Ingestion 
   * The data collected from the sources is stored on [HDFS](http://hadoop.apache.org/docs/r1.2.1/hdfs_design.html) with 3 data nodes and 1 name node. 
   
-  * 3 consumers are collecting data from the Rendr frontend and send messages to [Kafka](http://kafka.apache.org/) when the user performs an action such as liking the restaurant that was recommended. These messages are consumed using [camus] (https://github.com/linkedin/camus). [Camus] (https://github.com/linkedin/camus) is a tool built by [Linkedin] (https://www.linkedin.com/) which is essentially a distributed consumer running a map reduce job underneath to consume messages from [Kafka] (http://kafka.apache.org/) and save them to [HDFS](http://hadoop.apache.org/docs/r1.2.1/hdfs_design.html).
+  * 3 consumers are collecting data from the Rendr frontend and send messages to [Kafka](http://kafka.apache.org/) when the user performs an action such as clicking no for the restaurant that was recommended. These messages are sent in the same format as the foursquare data and can be processed in the same manner. They are consumed using [camus] (https://github.com/linkedin/camus). [Camus] (https://github.com/linkedin/camus) is a tool built by [Linkedin] (https://www.linkedin.com/) which is a distributed consumer running a map reduce job underneath to consume messages from [Kafka] (http://kafka.apache.org/) and save them to [HDFS] (http://hadoop.apache.org/docs/r1.2.1/hdfs_design.html).
   
  * ### Batch Processing
   [Spark](http://spark.apache.org/docs/latest/index.html) and [Graphx](http://spark.apache.org/graphx) is used for all batch processing. 
