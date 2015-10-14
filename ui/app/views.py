@@ -5,11 +5,17 @@ import json
 import urllib
 import urllib2
 import oauth2
+from kafka.client import KafkaClient
+from kafka.producer import SimpleProducer
 
 cluster = Cluster(['ec2-54-215-252-32.us-west-1.compute.amazonaws.com']) 
 session = cluster.connect('prod') 
 
+client = KafkaClient('ec2-54-193-76-148.us-west-1.compute.amazonaws.com')
+producer = SimpleProducer(client)
+
 recommendations = []
+user_id = ""
 
 API_HOST = 'api.yelp.com'
 BUSINESS_PATH = '/v2/business/'
@@ -109,7 +115,12 @@ def get_next():
 	# Implies the user clicked no, so increment the counter to get the next item in the recommendation list
 	count = int(request.args.get('counter'))
 	count = count + 1
-	
+
+	# This implies user did not like the previous recommendation so send appropriate message to kafka with low rating. 
+	# we're not concerned with actual value
+	msg = "%s | %s | 1" % (user_id, recommendations[count - 1])
+	producer.send_messages('user_input', msg)
+
 	# Get redirect url and metadata
 	img = get_business(recommendations[count]).get('image_url')
 	url = 'http://www.yelp.com/biz/' + recommendations[count]
