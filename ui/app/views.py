@@ -14,9 +14,6 @@ session = cluster.connect('prod')
 client = KafkaClient('ec2-54-193-76-148.us-west-1.compute.amazonaws.com')
 producer = SimpleProducer(client)
 
-recommendations = []
-user_id = ""
-
 API_HOST = 'api.yelp.com'
 BUSINESS_PATH = '/v2/business/'
 
@@ -64,7 +61,10 @@ def signup():
 
 @app.route('/login')
 def login():
+	global user_id 
+	global recommendations 
 	user_id = request.args.get('username')
+	recommendations = []
 	# If username is not given, prompt for signup
 	if user_id != "" : 
 		# Get the most recent restaurant liked by the user
@@ -112,6 +112,8 @@ def login():
 
 @app.route('/next')
 def get_next():
+	global user_id
+	global recommendations
 	# Implies the user clicked no, so increment the counter to get the next item in the recommendation list
 	count = int(request.args.get('counter'))
 	count = count + 1
